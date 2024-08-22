@@ -4,14 +4,29 @@
     justify-content: center;
 }
 .card {
-    width: 10vw;
-    margin: 10px;
+    width: 15vw;
+    height: 20vw;
+    margin: 1vw;
     position: relative;
+    background: linear-gradient(90deg, #ccc, #eee, #ccc);
+    background-size: 200% 200%;
+    animation: shimmer 1.5s infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .card img {
     width: 100%;
     height: auto;
     cursor: pointer;
+    display: none;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1;
+}
+.card img:hover {
+    transform: scale(1.1);
+    filter: grayscale(70%);
+    z-index: 10;
 }
 .modal {
     display: none;
@@ -35,18 +50,25 @@
     width: auto;
     height: auto;
 }
-
 .prev-button,
 .next-button {
-margin: 10px;
-width: 70px;
-padding: 10px;
-background-color: blue;
-border: none;
-cursor: pointer;
-color: white;
-border-radius: 30px;
-font-weight: 900;
+    margin: 10px;
+    width: 70px;
+    height: 300px;
+    padding: 10px;
+    background-color: rgb(219, 219, 219);
+    border: none;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    border-radius: 50px;
+    font-weight: 900;
+    font-size: 38px;
+    transition: transform 0.5s ease-in-out;
+}
+.prev-button:hover,
+.next-button:hover {
+    background-color: rgb(175, 175, 175);
+    color: white;
 }
 .close {
     position: absolute;
@@ -56,4 +78,18 @@ font-weight: 900;
     font-size: 40px;
     font-weight: bold;
     cursor: pointer;
+}
+@keyframes shimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+    33% {
+        background-position: 50% 100%;
+    }
+    66% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 50% 0%;
+    }
 }

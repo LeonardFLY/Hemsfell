@@ -1,73 +1,46 @@
 document.addEventListener('DOMContentLoaded', () => {
     const cardContainer = document.getElementById('card-blue');
-    let loadedImages = 0;
-    let totalImages = 0;
-    const imagePaths = [];
+    const totalCards = 200; // Substitua pelo número total de cartas
 
-    // Função para carregar o arquivo JSON
-    fetch('/fileCounts.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(fileCounts => {
-            Object.keys(fileCounts).forEach(folder => {
-                const totalCards = fileCounts[folder];
-                for (let i = 1; i <= totalCards; i++) {
-                    const cardPath = `Cartas Tabletopia/${folder}/Carta (${i}).png`;
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    const img = document.createElement('img');
-                    img.src = cardPath;
-                    img.alt = `Carta ${i}`;
-                    img.loading = 'lazy'; // Aplicar lazy loading
-                    img.style.display = 'none';
-                    card.appendChild(img);
-                    cardContainer.appendChild(card);
+    const folders = [
+        'Verde/Campeões', 'Verde/Criatura', 'Verde/Feitiço', 'Verde/Feitiço acelerado', 'Verde/Encanto', 'Verde/Artefato', 'Verde/Terreno Cruel',
+        
+        'Roxo/Campeões', 'Roxo/Criatura', 'Roxo/Feitiço', 'Roxo/Feitiço acelerado', 'Roxo/Encanto', 'Roxo/Artefato', 'Roxo/Terreno Cruel',
+        
+        'Azul/Campeões', 'Azul/Criatura', 'Azul/Feitiço', 'Azul/Feitiço acelerado', 'Azul/Encanto', 'Azul/Artefato', 'Azul/Terreno Cruel',
+        
+        'Vermelho/Campeões', 'Vermelho/Criatura', 'Vermelho/Feitiço', 'Vermelho/Feitiço acelerado', 'Vermelho/Encanto', 'Vermelho/Artefato', 'Vermelho/Terreno Cruel',
+        
+        'Neutro/Campeões', 'Neutro/Criatura', 'Neutro/Feitiço', 'Neutro/Feitiço acelerado', 'Neutro/Encanto', 'Neutro/Artefato', 'Neutro/Terreno Cruel',
+        
+        'Multi/Campeões', 'Multi/Criatura', 'Multi/Feitiço', 'Multi/Feitiço acelerado', 'Multi/Encanto', 'Multi/Artefato', 'Multi/Terreno Cruel'
+    ];
 
-                    // Armazena os caminhos das imagens para controle
-                    imagePaths.push(cardPath);
-                    totalImages++;
+    let cardIndex = 1;
 
-                    img.onload = () => {
-                        loadedImages++;
-                        if (loadedImages === totalImages) {
-                            document.querySelectorAll('.card').forEach(card => {
-                                card.style.background = 'none';
-                                card.querySelector('img').style.display = 'block';
-                            });
-                        }
-                    };
-
-                    img.onerror = () => {
-                        console.error(`Erro ao carregar imagem: ${cardPath}`);
-                        loadedImages++;
-                        if (loadedImages === totalImages) {
-                            document.querySelectorAll('.card').forEach(card => {
-                                card.style.background = 'none';
-                                card.querySelector('img').style.display = 'block';
-                            });
-                        }
-                    };
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Erro ao carregar o arquivo JSON:', error);
-        });
+    folders.forEach(folder => {
+        for (let i = 1; i <= totalCards; i++) {
+            const cardPath = `Cartas Tabletopia/${folder}/Carta (${i}).png`;
+            const img = new Image();
+            img.src = cardPath;
+            img.onload = () => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<img src="${cardPath}" alt="Carta ${cardIndex}">`;
+                cardContainer.appendChild(card);
+                cardIndex++;
+            };
+        }
+    });
 
     const modal = document.getElementById('myModal');
     const modalImg = document.getElementById('img01');
     const closeModal = document.querySelector('.close');
-    let currentImageIndex = 0;
 
     cardContainer.addEventListener('click', (e) => {
         if (e.target.tagName === 'IMG') {
             modal.style.display = 'flex';
             modalImg.src = e.target.src;
-            currentImageIndex = Array.from(cardContainer.children).indexOf(e.target.parentNode);
         }
     });
 
@@ -81,31 +54,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const prevButton = document.createElement('button');
-    prevButton.classList.add('prev-button');
-    prevButton.textContent = '<';
+cardContainer.addEventListener('click', (e) => {
+    if (e.target.tagName === 'IMG') {
+    modal.style.display = 'flex';
+    modalImg.src = e.target.src;
+    currentImageIndex = Array.from(cardContainer.children).indexOf(e.target.parentNode); // Encontrar o índice da imagem clicada
+    }
+});
 
-    const nextButton = document.createElement('button');
-    nextButton.classList.add('next-button');
-    nextButton.textContent = '>';
+// Botões de navegação
+const prevButton = document.createElement('button');
+prevButton.classList.add('prev-button');
+prevButton.textContent = '<';
+const nextButton = document.createElement('button');
+nextButton.classList.add('next-button');
+nextButton.textContent = '>';
 
-    modal.appendChild(prevButton);
-    modal.appendChild(modalImg);
-    modal.appendChild(nextButton);
+modal.appendChild(prevButton);
+modal.appendChild(modalImg);
+modal.appendChild(nextButton);
 
-    prevButton.addEventListener('click', () => {
-        currentImageIndex--;
-        if (currentImageIndex < 0) {
-            currentImageIndex = totalImages - 1;
-        }
-        modalImg.src = imagePaths[currentImageIndex];
-    });
+prevButton.addEventListener('click', () => {
+currentImageIndex--;
+    if (currentImageIndex < 0) {
+        currentImageIndex = totalCards - 1; // Voltar para a última imagem
+    }
+modalImg.src = cardContainer.children[currentImageIndex].querySelector('img').src;
+});
 
-    nextButton.addEventListener('click', () => {
-        currentImageIndex++;
-        if (currentImageIndex >= totalImages) {
-            currentImageIndex = 0;
-        }
-        modalImg.src = imagePaths[currentImageIndex];
-    });
+nextButton.addEventListener('click', () => {
+currentImageIndex++;
+    if (currentImageIndex >= totalCards) {
+        currentImageIndex = 0; // Ir para a primeira imagem
+    }
+modalImg.src = cardContainer.children[currentImageIndex].querySelector('img').src;
+});
 });
